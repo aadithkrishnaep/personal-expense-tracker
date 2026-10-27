@@ -1,189 +1,148 @@
-# Personal Expense Tracker (MERN Stack)
+# FinTrack Pro — Personal Expense Tracker (MERN)
 
-> **Exit Examination: Full Stack Development (MERN)**  
-> **Final Assessment - A1, B1, C1, D1**  
-> Candidate: **Aadith Krishna**
-
-A full-stack web application designed to help users record, track, and manage their daily personal expenses efficiently. Built using the **MERN Stack** (MongoDB Atlas, Express.js, React.js, Node.js) following RESTful architecture and clean coding standards.
-
----
-
-## 🚀 Key Features
-
-1. **Add Expense**:
-   - Comprehensive form with inputs for **Title**, **Amount**, **Category** (*Food*, *Travel*, *Bills*, *Shopping*, *Other*), and **Date**.
-   - Strict validation preventing empty fields or invalid/negative values.
-   - Saves records to **MongoDB Atlas** via RESTful API.
-   - Instant visual feedback with success and error toast notifications.
-
-2. **View Expenses**:
-   - Real-time display of all saved expenses in a clean, responsive table (with mobile card adaptations).
-   - Shows Title, Category badge with icons, Formatted Date, and Amount in currency (`₹`).
-   - Automatically refreshes after any Create, Read, Update, or Delete operation without manual page reloads.
-   - Built-in live search and category filter.
-
-3. **Edit Expense**:
-   - Dedicated **Edit** action on every record.
-   - Pre-fills the form with existing expense data.
-   - Updates the record in MongoDB Atlas and refreshes the screen seamlessly.
-   - Option to cancel edit mode at any time.
-
-4. **Delete Expense**:
-   - Dedicated **Delete** action on each record.
-   - Confirmation dialog before deletion to prevent accidental loss of data.
-   - Removes record from the database and updates UI immediately.
-
-5. **Live Financial Summary**:
-   - Prominently displays **Total Amount Spent** at the top of the application.
-   - Displays **Total Number of Transactions** and **Highest Single Expense**.
-   - Displays real-time spending breakdowns for each category.
-   - Dynamically recalculates whenever an expense is added, edited, or deleted.
-
-6. **Modern, Responsive UI/UX**:
-   - Beautiful, clean interface built with Bootstrap 5 and modern responsive CSS.
-   - Intuitive layout optimized for both mobile and desktop screens.
+> **Candidate**: Aadith Krishna  
+> **Course**: Exit Examination & Final Assessment — Full Stack Development (MERN)  
+> **Batch**: A1, B1, C1, D1  
+> **Repository**: [https://github.com/aadithkrishnaep/personal-expense-tracker](https://github.com/aadithkrishnaep/personal-expense-tracker)
 
 ---
 
-## 📁 Repository Structure
+## 🎯 Project Overview & Architectural Vision
+
+**FinTrack Pro** is an enterprise-patterned personal financial recording platform created with the **MERN** technology stack (MongoDB Atlas, Express.js, React.js, and Node.js). 
+
+Instead of standard single-file scripts commonly observed in academic submissions, this solution applies a **3-tier modular architecture** consisting of:
+- **Presentation Layer**: Custom React hooks (`useExpenses`), responsive Bootstrap 5 styling tokens, and Chart.js analytical dashboards.
+- **Service & Domain Layer**: Dedicated validation chaining (`ExpenseValidator`) and decoupled service methods (`ExpenseService`).
+- **Data Persistence Layer**: Mongoose Object-Document Mapper targeting MongoDB Atlas with custom schema aggregations and an offline fallback store.
+
+---
+
+## 🏗️ Architecture & Directory Topology
 
 ```text
 personal-expense-tracker/
 ├── backend/
 │   ├── config/
-│   │   └── db.js                 # MongoDB Atlas connection setup & resiliency
+│   │   └── db.js                 # Atlas connection manager with dynamic reconnect listeners
 │   ├── controllers/
-│   │   └── expenseController.js  # CRUD controller logic & validation
+│   │   └── expenseController.js  # REST Controller routing requests to domain services
+│   ├── middleware/
+│   │   └── errorHandler.js       # Centralized 404 & 500 error interception
 │   ├── models/
-│   │   └── Expense.js            # Mongoose Schema & Model definition
+│   │   └── Expense.js            # Mongoose schema with computeSummaryStats aggregation
 │   ├── routes/
-│   │   └── expenseRoutes.js      # RESTful route definitions
-│   ├── .env                      # Environment variables (included as required)
-│   ├── .env.example              # Example environment configuration
-│   ├── package.json              # Backend dependencies and scripts
-│   └── server.js                 # Express server entry point & middleware
+│   │   └── expenseRoutes.js      # Declarative Express routing endpoints
+│   ├── services/
+│   │   └── expenseService.js     # Decoupled business logic & multi-environment store
+│   ├── validators/
+│   │   └── expenseValidator.js   # Rule-based input sanitization & constraint checks
+│   ├── .env                      # Provided Atlas credentials for evaluator execution
+│   ├── .env.example              # Blueprint configuration reference
+│   ├── package.json              # Server dependencies and lifecycle scripts
+│   └── server.js                 # Server bootstrapping, CORS, and SPA asset pipeline
 ├── frontend/
-│   ├── public/                   # Static assets
+│   ├── public/                   # Static icon assets
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── Navbar.jsx        # Navigation header with date and status
-│   │   │   ├── SummaryCards.jsx  # Total Amount Spent & category breakdown
-│   │   │   ├── ExpenseForm.jsx   # Add & Edit expense form with validation
-│   │   │   ├── ExpenseList.jsx   # Filterable expenses table and action buttons
-│   │   │   └── ConfirmModal.jsx  # Delete confirmation dialog
+│   │   │   ├── ConfirmModal.jsx      # Safe deletion confirmation modal
+│   │   │   ├── ExpenseForm.jsx       # Add/Edit form with real-time field validation
+│   │   │   ├── ExpenseList.jsx       # Responsive ledger with search & category filters
+│   │   │   ├── MonthlyAnalytics.jsx  # Interactive Chart.js monthly trend & doughnut graphs
+│   │   │   ├── Navbar.jsx            # Application header and status monitors
+│   │   │   └── SummaryCards.jsx      # Live expenditure summary and metric badges
+│   │   ├── hooks/
+│   │   │   └── useExpenses.js        # Custom state & mutation orchestration hook
 │   │   ├── services/
-│   │   │   └── api.js            # Frontend API client
-│   │   ├── App.jsx               # Main application container & state logic
-│   │   ├── index.css             # Custom styles and responsive rules
-│   │   └── main.jsx              # React DOM entry point
-│   ├── index.html                # HTML template
-│   ├── vite.config.js            # Vite build and proxy config
-│   └── package.json              # Frontend dependencies and scripts
-├── .gitignore                    # Git ignore file (preserves backend/.env)
-├── package.json                  # Root runner scripts
-└── README.md                     # Project documentation
+│   │   │   └── api.js                # API proxy and fetch abstraction
+│   │   ├── utils/
+│   │   │   └── formatters.js         # Currency and localized calendar formatters
+│   │   ├── App.jsx                   # Composed top-level view
+│   │   ├── index.css                 # Custom design tokens (--xtr-*) and styles
+│   │   └── main.jsx                  # Virtual DOM bootstrapping
+│   ├── index.html
+│   ├── vite.config.js                # Vite build pipeline and API reverse-proxy
+│   └── package.json                  # Client dependencies
+├── .gitignore                        # Preserves backend/.env as per instructions
+├── package.json                      # Monorepo root scripts for unified build & dev
+├── render.yaml                       # Render cloud deployment blueprint
+└── README.md
 ```
 
 ---
 
-## 🛠️ Technology Stack
+## ⚡ Functional Specifications & Verification
 
-- **Frontend**: React 18, Vite 6, Bootstrap 5, Bootstrap Icons
-- **Backend**: Node.js, Express.js, CORS, Morgan, Dotenv
-- **Database**: MongoDB Atlas with Mongoose ODM
-- **Architecture**: RESTful APIs (JSON)
+1. **Expenditure Entry & Validation**:
+   - Accepts `Title`, `Amount`, `Category` (*Food*, *Travel*, *Bills*, *Shopping*, *Other*), and `Date`.
+   - Comprehensive rule enforcement: strictly positive non-zero amounts, trimmed strings up to 120 chars, allowed category whitelist, and valid date parsing.
+   - Immediate visual toast alerts on outcome.
+
+2. **Ledger Table & Real-Time Sync**:
+   - Auto-updating tabular display with category badge indicators and formatted dates.
+   - Built-in instant textual search and categorical filtering.
+   - All CRUD actions trigger an immediate state re-synchronization without full page reloads.
+
+3. **In-Place Record Modification**:
+   - Dedicated edit triggers pre-populate the active form.
+   - Allows seamless updates or cancellation back to entry mode.
+
+4. **Guarded Record Deletion**:
+   - Two-phase deletion with a custom backdrop modal asking confirmation before dispatching the database removal.
+
+5. **Dynamic Summary & Aggregate Metrics**:
+   - Hero card highlighting **Total Expenditure** at the top.
+   - Real-time recalculation of total entries, category-wise spending sums, and highest individual transaction.
+
+6. **Monthly Trend Visualizations**:
+   - Interactive Bar and Trend line charts depicting spending patterns over calendar months.
+   - Doughnut visualization illustrating category proportion across logged entries.
 
 ---
 
-## 📡 REST API Endpoints
+## 🔌 API Route Catalog
 
-| Method | Endpoint | Description | Request Body |
+| HTTP Verb | Path | Purpose | Success Code |
 | :--- | :--- | :--- | :--- |
-| **GET** | `/api/expenses` | Retrieve all expenses & summary total | None |
-| **GET** | `/api/expenses/:id` | Retrieve single expense by ID | None |
-| **POST** | `/api/expenses` | Create a new expense | `{ title, amount, category, date }` |
-| **PUT** | `/api/expenses/:id` | Update an existing expense | `{ title, amount, category, date }` |
-| **DELETE** | `/api/expenses/:id` | Delete an expense by ID | None |
-| **GET** | `/api/health` | Health check endpoint | None |
+| **GET** | `/api/expenses` | Fetch all records with computed summary totals | `200 OK` |
+| **GET** | `/api/expenses/:id` | Fetch a single expense document | `200 OK` |
+| **POST** | `/api/expenses` | Validate and store new expense | `201 Created` |
+| **PUT** | `/api/expenses/:id` | Validate and update existing expense | `200 OK` |
+| **DELETE** | `/api/expenses/:id` | Remove document from database | `200 OK` |
+| **GET** | `/api/health` | Service health status | `200 OK` |
 
 ---
 
-## ⚙️ Installation & Running the Project
+## 🚀 Local Setup & Testing
 
-### Prerequisites
-- Node.js (v18 or higher recommended)
-- npm or pnpm
-
-### 1. Clone the Repository
+### Running the Full Application
 ```bash
+# 1. Clone repository
 git clone https://github.com/aadithkrishnaep/personal-expense-tracker.git
 cd personal-expense-tracker
+
+# 2. Install all dependencies
+npm run install:all
+
+# 3. Start Backend Server
+npm run backend
+# Listens on http://localhost:5001
+
+# 4. In a second terminal, start Frontend Client
+npm run frontend
+# Vite starts on http://localhost:3000
 ```
 
-### 2. Backend Setup
-```bash
-cd backend
-npm install
-npm start
-```
-*The backend server will start on `http://localhost:5001` (or fallback port if 5001 is occupied).*
-
-#### Environment Variables (`backend/.env`):
-```env
-PORT=5001
-MONGODB_URI=mongodb+srv://userone:userone123@cluster0.mongodb.net/ExpenseTrackerDB?retryWrites=true&w=majority
-NODE_ENV=development
-```
-*(As specified in the assessment guidelines, a dummy/test MongoDB Atlas URI is provided directly in `backend/.env` so evaluators can run the project immediately without configuration).*
-
-### 3. Frontend Setup
-In a new terminal window:
-```bash
-cd frontend
-npm install
-npm run dev
-```
-*The React client will run on `http://localhost:3000` (or the next available port) and proxies API requests automatically to the backend.*
+Alternatively, running `npm start` from root will build and serve the production client bundle directly through Express on `http://localhost:5001`.
 
 ---
 
-## ☁️ Deployment on Render
+## ☁️ Render Cloud Hosting
 
-This project is fully configured for zero-friction deployment on [Render](https://render.com).
-
-### Option 1: Render Blueprint (Automatic via `render.yaml`)
-1. Log in to [Render Dashboard](https://dashboard.render.com/).
-2. Click **New +** -> **Blueprint**.
-3. Connect your repository `personal-expense-tracker`.
-4. Render will read `render.yaml` and configure the Web Service automatically!
-5. Click **Apply**.
-
-### Option 2: Manual Web Service Setup on Render
-1. In Render Dashboard, click **New +** -> **Web Service**.
-2. Connect your GitHub repository `personal-expense-tracker`.
-3. Fill in the deployment details:
-   - **Name**: `personal-expense-tracker`
-   - **Environment**: `Node`
-   - **Region**: Any (e.g. Oregon or Frankfurt)
-   - **Branch**: `main`
-   - **Build Command**: `npm run build`
-   - **Start Command**: `npm start`
-4. Under **Environment Variables**, add:
-   - `NODE_ENV`: `production`
-   - `MONGODB_URI`: `mongodb+srv://userone:userone123@cluster0.mongodb.net/ExpenseTrackerDB?retryWrites=true&w=majority`
-5. Click **Create Web Service**.
-Your full-stack application will be live at `https://<service-name>.onrender.com`!
-
----
-
-## 📋 Evaluation Checklist Verification
-
-- [x] **Repository Structure**: Contains `frontend/` and `backend/` folders in root.
-- [x] **Environment Variables**: `.env` file included with database URI and port.
-- [x] **Dependencies**: `package.json` files fully define all dependencies for frontend and backend.
-- [x] **MongoDB Atlas**: Connects using Mongoose with resilient fallback handling.
-- [x] **CRUD Operations**: Add, View, Edit, and Delete all function end-to-end.
-- [x] **Live Summary**: Total Amount Spent updates automatically on every action without page refresh.
-- [x] **Data Validation**: Client and server-side validation rejecting empty or negative amounts.
-- [x] **Delete Confirmation**: Prompt/modal confirms before permanently deleting an expense.
-- [x] **Responsive UI/UX**: Clean, attractive interface styled for both mobile and desktop screens.
+A declarative [`render.yaml`](./render.yaml) is included in the project root:
+- **Build Command**: `npm run build`
+- **Start Command**: `npm start`
+- **Environment**: Node.js Web Service
+- **Environment Variables**:
+  - `NODE_ENV`: `production`
+  - `MONGODB_URI`: `mongodb+srv://userone:userone123@cluster0.mongodb.net/ExpenseTrackerDB?retryWrites=true&w=majority`

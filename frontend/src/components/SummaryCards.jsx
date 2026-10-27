@@ -1,25 +1,16 @@
+/**
+ * Summary Analytics Cards Component
+ * Author: Aadith Krishna
+ * Exit Examination: Full Stack Development (MERN)
+ */
+
 import React from 'react';
+import { formatCurrencyINR } from '../utils/formatters';
 
-const SummaryCards = ({ expenses = [], totalAmount = 0 }) => {
-  const formatCurrency = (val) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 2,
-    }).format(val || 0);
-  };
-
-  // Find highest single expense
-  const highestExpense = expenses.length > 0
-    ? Math.max(...expenses.map((e) => Number(e.amount) || 0))
-    : 0;
-
-  // Calculate category breakdowns
-  const categoryTotals = expenses.reduce((acc, curr) => {
-    const cat = curr.category || 'Other';
-    acc[cat] = (acc[cat] || 0) + (Number(curr.amount) || 0);
-    return acc;
-  }, {});
+const SummaryCards = ({ expenses = [], totalAmount = 0, computedMetrics = {} }) => {
+  const peakAmount = computedMetrics.peakExpenditure ?? 0;
+  const count = computedMetrics.recordCount ?? expenses.length;
+  const categoryMap = computedMetrics.categoryDistribution ?? {};
 
   const categories = ['Food', 'Travel', 'Bills', 'Shopping', 'Other'];
 
@@ -32,90 +23,90 @@ const SummaryCards = ({ expenses = [], totalAmount = 0 }) => {
   };
 
   return (
-    <div className="mb-4">
+    <section className="mb-4" aria-label="Financial Summary Cards">
       <div className="row g-3">
-        {/* Total Amount Spent Card (Hero Requirement) */}
+        {/* Total Amount Spent Card (Core Requirement) */}
         <div className="col-12 col-md-4">
-          <div className="stat-card primary-gradient h-100">
+          <div className="xtr-metric-card xtr-metric-hero">
             <div className="d-flex justify-content-between align-items-start mb-2">
-              <span className="text-white-50 small text-uppercase fw-bold" style={{ letterSpacing: '0.05em' }}>
-                Total Amount Spent
+              <span className="text-white-50 small text-uppercase fw-bold" style={{ letterSpacing: '0.06em' }}>
+                Total Expenditure
               </span>
               <div
                 style={{
-                  width: '38px',
-                  height: '38px',
+                  width: '40px',
+                  height: '40px',
                   borderRadius: '10px',
-                  background: 'rgba(255, 255, 255, 0.2)',
+                  background: 'rgba(255, 255, 255, 0.18)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}
               >
-                <i className="bi bi-cash-stack fs-5"></i>
+                <i className="bi bi-wallet2 text-white fs-5"></i>
               </div>
             </div>
-            <h2 className="display-6 fw-bold mb-1 text-white">{formatCurrency(totalAmount)}</h2>
+            <h2 className="display-6 fw-bold mb-1 text-white">{formatCurrencyINR(totalAmount)}</h2>
             <p className="text-white-50 small mb-0">
-              Updated automatically across all records
+              Synchronized automatically across all CRUD operations
             </p>
           </div>
         </div>
 
-        {/* Total Transactions Card */}
+        {/* Transaction Count Card */}
         <div className="col-6 col-md-4">
-          <div className="stat-card h-100">
+          <div className="xtr-metric-card">
             <div className="d-flex justify-content-between align-items-start mb-2">
               <span className="text-muted small text-uppercase fw-bold">
-                Total Expenses
+                Logged Transactions
               </span>
-              <div className="stat-icon-wrapper" style={{ background: '#eef2ff', color: '#4f46e5' }}>
-                <i className="bi bi-card-checklist"></i>
+              <div className="xtr-metric-icon" style={{ background: '#eef2ff', color: '#4338ca' }}>
+                <i className="bi bi-receipt"></i>
               </div>
             </div>
-            <h3 className="fw-bold mb-1 text-dark">{expenses.length}</h3>
-            <p className="text-muted small mb-0">Recorded entries in database</p>
+            <h3 className="fw-bold mb-1 text-dark">{count}</h3>
+            <p className="text-muted small mb-0">Database ledger records</p>
           </div>
         </div>
 
-        {/* Highest Single Expense Card */}
+        {/* Peak Single Expense Card */}
         <div className="col-6 col-md-4">
-          <div className="stat-card h-100">
+          <div className="xtr-metric-card">
             <div className="d-flex justify-content-between align-items-start mb-2">
               <span className="text-muted small text-uppercase fw-bold">
-                Highest Expense
+                Peak Transaction
               </span>
-              <div className="stat-icon-wrapper" style={{ background: '#fffbeb', color: '#d97706' }}>
-                <i className="bi bi-graph-up-arrow"></i>
+              <div className="xtr-metric-icon" style={{ background: '#fffbeb', color: '#b45309' }}>
+                <i className="bi bi-arrow-up-right-circle-fill"></i>
               </div>
             </div>
-            <h3 className="fw-bold mb-1 text-dark">{formatCurrency(highestExpense)}</h3>
-            <p className="text-muted small mb-0">Single largest transaction</p>
+            <h3 className="fw-bold mb-1 text-dark">{formatCurrencyINR(peakAmount)}</h3>
+            <p className="text-muted small mb-0">Highest individual entry</p>
           </div>
         </div>
       </div>
 
-      {/* Quick Category Summary Pills */}
+      {/* Category breakdown pill strip */}
       {expenses.length > 0 && (
         <div className="d-flex flex-wrap gap-2 mt-3 p-3 bg-white rounded-3 border">
           <span className="small fw-bold text-muted align-self-center me-2">By Category:</span>
           {categories.map((cat) => {
-            const sum = categoryTotals[cat] || 0;
+            const sum = categoryMap[cat] || 0;
             return (
               <div
                 key={cat}
-                className={`badge-category badge-${cat} d-flex align-items-center gap-1`}
+                className={`xtr-badge-cat xtr-cat-${cat}`}
                 style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem' }}
               >
                 <i className={`bi ${categoryIcons[cat]}`}></i>
                 <span>{cat}:</span>
-                <span className="fw-bold">{formatCurrency(sum)}</span>
+                <span className="fw-bold">{formatCurrencyINR(sum)}</span>
               </div>
             );
           })}
         </div>
       )}
-    </div>
+    </section>
   );
 };
 

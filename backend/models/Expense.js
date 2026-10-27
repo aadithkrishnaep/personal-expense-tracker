@@ -1,52 +1,90 @@
+/**
+ * Mongoose Schema & Data Model for Personal Expenses
+ * Author: Aadith Krishna
+ * Exit Examination: Full Stack Development (MERN)
+ */
+
 const mongoose = require('mongoose');
+const { ALLOWED_CATEGORIES } = require('../validators/expenseValidator');
 
 const expenseSchema = new mongoose.Schema(
   {
     title: {
       type: String,
-      required: [true, 'Please provide an expense title'],
+      required: [true, 'Expense title is required'],
       trim: true,
-      minlength: [1, 'Title cannot be empty'],
-      maxlength: [100, 'Title cannot exceed 100 characters'],
+      maxlength: [120, 'Title cannot exceed 120 characters'],
     },
     amount: {
       type: Number,
-      required: [true, 'Please provide an amount'],
+      required: [true, 'Monetary amount is required'],
       min: [0.01, 'Amount must be greater than zero'],
       validate: {
-        validator: function (v) {
-          return typeof v === 'number' && !isNaN(v) && v > 0;
-        },
-        message: 'Amount must be a positive number',
+        validator: (val) => typeof val === 'number' && Number.isFinite(val) && val > 0,
+        message: 'Amount must be a positive non-zero number',
       },
     },
     category: {
       type: String,
-      required: [true, 'Please select a category'],
+      required: [true, 'Expense category is required'],
       enum: {
-        values: ['Food', 'Travel', 'Bills', 'Shopping', 'Other'],
-        message: '{VALUE} is not a supported category',
+        values: ALLOWED_CATEGORIES,
+        message: '{VALUE} is not a valid category',
       },
       default: 'Other',
     },
     date: {
       type: Date,
-      required: [true, 'Please provide a date'],
+      required: [true, 'Expense transaction date is required'],
       default: Date.now,
     },
   },
   {
     timestamps: true,
+    toJSON: {
+      virtuals: true,
+      transform: (_, record) => {
+        record.id = record._id.toString();
+        delete record.__v;
+        return record;
+      },
+    },
   }
 );
 
-// Virtual field or transform to ensure clean JSON output
-expenseSchema.set('toJSON', {
-  virtuals: true,
-  transform: (doc, ret) => {
-    ret.id = ret._id;
-    return ret;
-  },
-});
+// Performance index for frequent date-based sorting and category queries
+expenseSchema.index({ date: -1, createdAt: -1 });
+expenseSchema.index({ category: 1 });
+
+/**
+ * Aggregation helper to compute total expenditure and categorical counts
+ */
+expenseSchema.statics.computeSummaryStats = async function () {
+  const result = await this.aggregate([
+    {
+      $group: {
+        _id: null,
+        totalExpenditure: { $sum: '$amount' },
+        totalEntries: { $sum: 1 },
+        peakExpense: { $max: '$amount' },
+      },
+    },
+  ]);
+
+  if (!result || result.length === 0) {
+    return {
+      totalAmount: 0,
+      count: 0,
+      peakExpense: 0,
+    };
+  }
+
+  const stat = result[0];
+  return {
+    totalAmount: Math.round(stat.totalExpenditure * 100) / 100,
+    count: stat.totalEntries,
+    peakExpense: Math.round(stat.peakExpense * 100) / 100,
+  };
+};
 
 module.exports = mongoose.model('Expense', expenseSchema);

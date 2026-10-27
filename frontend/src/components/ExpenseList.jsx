@@ -1,4 +1,11 @@
+/**
+ * Expense Table & List View Component
+ * Author: Aadith Krishna
+ * Exit Examination: Full Stack Development (MERN)
+ */
+
 import React, { useState } from 'react';
+import { formatCurrencyINR, formatCalendarDate } from '../utils/formatters';
 
 const ExpenseList = ({
   expenses = [],
@@ -6,30 +13,11 @@ const ExpenseList = ({
   onDeleteRequest,
   isLoading,
 }) => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [sortBy, setSortBy] = useState('date-desc');
+  const [queryTerm, setQueryTerm] = useState('');
+  const [filterCategory, setFilterCategory] = useState('All');
+  const [sortCriteria, setSortCriteria] = useState('date-desc');
 
-  const formatCurrency = (val) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 2,
-    }).format(val || 0);
-  };
-
-  const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) return dateString;
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
-  };
-
-  const categoryIcons = {
+  const categoryIconMap = {
     Food: 'bi-cup-hot-fill',
     Travel: 'bi-airplane-fill',
     Bills: 'bi-receipt-cutoff',
@@ -37,73 +25,63 @@ const ExpenseList = ({
     Other: 'bi-tag-fill',
   };
 
-  // Filter & Search logic
-  const filteredExpenses = expenses
-    .filter((item) => {
-      const matchesSearch = item.title
-        ?.toLowerCase()
-        .includes(searchTerm.toLowerCase().trim());
-      const matchesCategory =
-        selectedCategory === 'All' || item.category === selectedCategory;
-      return matchesSearch && matchesCategory;
+  // Filter & Search computation
+  const visibleExpenses = expenses
+    .filter((entry) => {
+      const matchText = entry.title?.toLowerCase().includes(queryTerm.toLowerCase().trim());
+      const matchCat = filterCategory === 'All' || entry.category === filterCategory;
+      return matchText && matchCat;
     })
     .sort((a, b) => {
-      if (sortBy === 'date-desc') {
-        return new Date(b.date) - new Date(a.date);
-      }
-      if (sortBy === 'date-asc') {
-        return new Date(a.date) - new Date(b.date);
-      }
-      if (sortBy === 'amount-desc') {
-        return (Number(b.amount) || 0) - (Number(a.amount) || 0);
-      }
-      if (sortBy === 'amount-asc') {
-        return (Number(a.amount) || 0) - (Number(b.amount) || 0);
-      }
+      if (sortCriteria === 'date-desc') return new Date(b.date) - new Date(a.date);
+      if (sortCriteria === 'date-asc') return new Date(a.date) - new Date(b.date);
+      if (sortCriteria === 'amount-desc') return (Number(b.amount) || 0) - (Number(a.amount) || 0);
+      if (sortCriteria === 'amount-asc') return (Number(a.amount) || 0) - (Number(b.amount) || 0);
       return 0;
     });
 
   return (
-    <div className="content-card shadow-sm">
-      <div className="card-header-custom flex-column flex-md-row align-items-md-center gap-3">
+    <div className="xtr-panel">
+      {/* Header & Controls */}
+      <div className="xtr-panel-header flex-column flex-md-row align-items-md-center gap-3">
         <div>
-          <h5 className="mb-0 fw-bold">Expense History</h5>
+          <h5 className="mb-0 fw-bold">Expense Ledger</h5>
           <small className="text-muted">
-            Showing {filteredExpenses.length} of {expenses.length} records
+            Displaying {visibleExpenses.length} of {expenses.length} records
           </small>
         </div>
 
-        {/* Filter and Search Controls */}
+        {/* Search, Filter & Sort */}
         <div className="d-flex flex-wrap gap-2 w-100 w-md-auto">
-          {/* Search Input */}
-          <div className="input-group" style={{ minWidth: '200px', flex: '1 1 auto' }}>
+          {/* Search box */}
+          <div className="input-group" style={{ minWidth: '190px', flex: '1 1 auto' }}>
             <span className="input-group-text bg-light border-end-0 text-muted">
               <i className="bi bi-search"></i>
             </span>
             <input
               type="text"
-              className="form-control form-control-custom border-start-0 py-2"
-              placeholder="Search expenses..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              className="form-control xtr-input border-start-0 py-2"
+              placeholder="Search by title..."
+              value={queryTerm}
+              onChange={(e) => setQueryTerm(e.target.value)}
             />
-            {searchTerm && (
+            {queryTerm && (
               <button
                 className="btn btn-outline-secondary border-start-0"
                 type="button"
-                onClick={() => setSearchTerm('')}
+                onClick={() => setQueryTerm('')}
               >
                 <i className="bi bi-x"></i>
               </button>
             )}
           </div>
 
-          {/* Category Filter */}
+          {/* Category Dropdown */}
           <select
-            className="form-select form-select-custom py-2"
+            className="form-select xtr-select py-2"
             style={{ width: 'auto' }}
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
+            value={filterCategory}
+            onChange={(e) => setFilterCategory(e.target.value)}
           >
             <option value="All">All Categories</option>
             <option value="Food">Food</option>
@@ -115,10 +93,10 @@ const ExpenseList = ({
 
           {/* Sort Dropdown */}
           <select
-            className="form-select form-select-custom py-2"
+            className="form-select xtr-select py-2"
             style={{ width: 'auto' }}
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
+            value={sortCriteria}
+            onChange={(e) => setSortCriteria(e.target.value)}
           >
             <option value="date-desc">Newest First</option>
             <option value="date-asc">Oldest First</option>
@@ -128,16 +106,15 @@ const ExpenseList = ({
         </div>
       </div>
 
-      {/* Loading state */}
+      {/* Content table or empty state */}
       {isLoading ? (
         <div className="text-center py-5">
           <div className="spinner-border text-primary" role="status">
-            <span className="visually-hidden">Loading expenses...</span>
+            <span className="visually-hidden">Fetching ledger...</span>
           </div>
-          <p className="text-muted mt-2">Loading expense records...</p>
+          <p className="text-muted mt-2">Retrieving records from database...</p>
         </div>
-      ) : filteredExpenses.length === 0 ? (
-        /* Empty State */
+      ) : visibleExpenses.length === 0 ? (
         <div className="text-center py-5">
           <div
             style={{
@@ -153,97 +130,93 @@ const ExpenseList = ({
               marginBottom: '1rem',
             }}
           >
-            <i className="bi bi-inbox"></i>
+            <i className="bi bi-folder2-open"></i>
           </div>
-          <h6 className="fw-bold text-dark">No Expenses Found</h6>
+          <h6 className="fw-bold text-dark">No Matching Expenses</h6>
           <p className="text-muted small mb-3">
             {expenses.length === 0
-              ? 'Start by adding your first daily expense above.'
-              : 'No expenses match the current filter or search criteria.'}
+              ? 'Your ledger is empty. Add your first expense above.'
+              : 'No expense records found matching current search/filter criteria.'}
           </p>
-          {(searchTerm || selectedCategory !== 'All') && (
+          {(queryTerm || filterCategory !== 'All') && (
             <button
               className="btn btn-sm btn-outline-primary rounded-pill px-3"
               onClick={() => {
-                setSearchTerm('');
-                setSelectedCategory('All');
+                setQueryTerm('');
+                setFilterCategory('All');
               }}
             >
-              Clear Filters
+              Reset Filters
             </button>
           )}
         </div>
       ) : (
-        /* Expenses Table / List */
         <div className="table-responsive">
-          <table className="custom-table">
+          <table className="xtr-data-table">
             <thead>
               <tr>
-                <th style={{ width: '35%' }}>Title</th>
+                <th style={{ width: '35%' }}>Description / Title</th>
                 <th style={{ width: '20%' }}>Category</th>
                 <th style={{ width: '18%' }}>Date</th>
                 <th style={{ width: '15%' }} className="text-end">Amount</th>
-                <th style={{ width: '12%' }} className="text-center">Actions</th>
+                <th style={{ width: '12%' }} className="text-center">Action</th>
               </tr>
             </thead>
             <tbody>
-              {filteredExpenses.map((expense) => {
-                const id = expense._id || expense.id;
-                const category = expense.category || 'Other';
-                const iconClass = categoryIcons[category] || 'bi-tag-fill';
+              {visibleExpenses.map((expense) => {
+                const uniqueKey = expense._id || expense.id;
+                const cat = expense.category || 'Other';
+                const iconCls = categoryIconMap[cat] || 'bi-tag-fill';
 
                 return (
-                  <tr key={id}>
+                  <tr key={uniqueKey}>
                     {/* Title */}
                     <td>
                       <div className="fw-semibold text-dark">{expense.title}</div>
                       <small className="text-muted d-block d-md-none mt-1">
-                        {formatDate(expense.date)}
+                        {formatCalendarDate(expense.date)}
                       </small>
                     </td>
 
                     {/* Category */}
                     <td>
-                      <span className={`badge-category badge-${category}`}>
-                        <i className={`bi ${iconClass}`}></i>
-                        <span>{category}</span>
+                      <span className={`xtr-badge-cat xtr-cat-${cat}`}>
+                        <i className={`bi ${iconCls}`}></i>
+                        <span>{cat}</span>
                       </span>
                     </td>
 
                     {/* Date */}
-                    <td className="text-muted" style={{ fontSize: '0.92rem' }}>
-                      <i className="bi bi-calendar3 me-1 small"></i>
-                      {formatDate(expense.date)}
+                    <td className="text-secondary small">
+                      <i className="bi bi-calendar3 me-1"></i>
+                      {formatCalendarDate(expense.date)}
                     </td>
 
                     {/* Amount */}
                     <td className="text-end">
-                      <span className="amount-display text-primary">
-                        {formatCurrency(expense.amount)}
+                      <span className="fw-bold text-dark" style={{ fontSize: '1.02rem' }}>
+                        {formatCurrencyINR(expense.amount)}
                       </span>
                     </td>
 
                     {/* Actions: Edit & Delete */}
                     <td>
                       <div className="d-flex justify-content-center gap-2">
-                        {/* Edit Button */}
                         <button
                           type="button"
-                          className="btn-action btn-edit"
-                          title="Edit Expense"
+                          className="xtr-action-btn xtr-btn-edit"
+                          title="Edit this record"
                           onClick={() => onEdit(expense)}
                         >
-                          <i className="bi bi-pencil"></i>
+                          <i className="bi bi-pencil-fill" style={{ fontSize: '0.85rem' }}></i>
                         </button>
-
-                        {/* Delete Button */}
                         <button
                           type="button"
-                          className="btn-action btn-delete"
-                          title="Delete Expense"
+                          className="xtr-action-btn xtr-btn-delete"
+                          title="Delete this record"
                           onClick={() => onDeleteRequest(expense)}
                         >
-                          <i className="bi bi-trash"></i>
+                          <i className="bi bi-trash3-fill" style={{ fontSize: '0.85rem' }}></i>
                         </button>
                       </div>
                     </td>
