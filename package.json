@@ -1,0 +1,23 @@
+{
+  "name": "personal-expense-tracker",
+  "version": "1.0.0",
+  "description": "Full Stack MERN Personal Expense Tracker Web Application",
+  "scripts": {
+    "start": "node backend/server.js",
+    "backend": "cd backend && npm start",
+    "backend:dev": "cd backend && npm run dev",
+    "frontend": "cd frontend && npm run dev",
+    "frontend:build": "cd frontend && npm run build",
+    "install:all": "cd backend && npm install && cd ../frontend && npm install"
+  },
+  "keywords": [
+    "mern",
+    "mongodb",
+    "express",
+    "react",
+    "nodejs",
+    "expense-tracker"
+  ],
+  "author": "Aadith Krishna",
+  "license": "ISC"
+}
