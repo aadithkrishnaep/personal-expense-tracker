@@ -1,4 +1,8 @@
-const API_BASE = '/api/expenses';
+const API_BASE =
+  import.meta.env.VITE_API_URL ||
+  (window.location.port === '3000'
+    ? `http://${window.location.hostname}:5001/api/expenses`
+    : '/api/expenses');
 
 export const getExpenses = async () => {
   const response = await fetch(API_BASE);
