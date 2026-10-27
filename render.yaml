@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: personal-expense-tracker
+    env: node
+    plan: free
+    region: oregon
+    buildCommand: npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGODB_URI
+        value: mongodb+srv://userone:userone123@cluster0.mongodb.net/ExpenseTrackerDB?retryWrites=true&w=majority

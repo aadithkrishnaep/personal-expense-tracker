@@ -147,6 +147,35 @@ npm run dev
 
 ---
 
+## ☁️ Deployment on Render
+
+This project is fully configured for zero-friction deployment on [Render](https://render.com).
+
+### Option 1: Render Blueprint (Automatic via `render.yaml`)
+1. Log in to [Render Dashboard](https://dashboard.render.com/).
+2. Click **New +** -> **Blueprint**.
+3. Connect your repository `personal-expense-tracker`.
+4. Render will read `render.yaml` and configure the Web Service automatically!
+5. Click **Apply**.
+
+### Option 2: Manual Web Service Setup on Render
+1. In Render Dashboard, click **New +** -> **Web Service**.
+2. Connect your GitHub repository `personal-expense-tracker`.
+3. Fill in the deployment details:
+   - **Name**: `personal-expense-tracker`
+   - **Environment**: `Node`
+   - **Region**: Any (e.g. Oregon or Frankfurt)
+   - **Branch**: `main`
+   - **Build Command**: `npm run build`
+   - **Start Command**: `npm start`
+4. Under **Environment Variables**, add:
+   - `NODE_ENV`: `production`
+   - `MONGODB_URI`: `mongodb+srv://userone:userone123@cluster0.mongodb.net/ExpenseTrackerDB?retryWrites=true&w=majority`
+5. Click **Create Web Service**.
+Your full-stack application will be live at `https://<service-name>.onrender.com`!
+
+---
+
 ## 📋 Evaluation Checklist Verification
 
 - [x] **Repository Structure**: Contains `frontend/` and `backend/` folders in root.

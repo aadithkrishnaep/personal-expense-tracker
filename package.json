@@ -4,6 +4,7 @@
   "description": "Full Stack MERN Personal Expense Tracker Web Application",
   "scripts": {
     "start": "node backend/server.js",
+    "build": "cd frontend && npm install && npm run build && cd ../backend && npm install",
     "backend": "cd backend && npm start",
     "backend:dev": "cd backend && npm run dev",
     "frontend": "cd frontend && npm run dev",
