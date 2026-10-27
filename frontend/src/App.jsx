@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Navbar from './components/Navbar';
 import SummaryCards from './components/SummaryCards';
+import MonthlyAnalytics from './components/MonthlyAnalytics';
 import ExpenseForm from './components/ExpenseForm';
 import ExpenseList from './components/ExpenseList';
 import ConfirmModal from './components/ConfirmModal';
@@ -146,6 +147,9 @@ function App() {
 
         {/* Total Summary Cards at Top */}
         <SummaryCards expenses={expenses} totalAmount={totalAmount} />
+
+        {/* Monthly Spending Graphs & Analytics */}
+        <MonthlyAnalytics expenses={expenses} />
 
         {/* Add / Edit Form */}
         <ExpenseForm
