@@ -7,7 +7,7 @@
 
 ---
 
-## 🎯 Project Overview & Architectural Vision
+## Project Overview & Architectural Vision
 
 **FinTrack Pro** is an enterprise-patterned personal financial recording platform created with the **MERN** technology stack (MongoDB Atlas, Express.js, React.js, and Node.js). 
 
@@ -18,7 +18,7 @@ Instead of standard single-file scripts commonly observed in academic submission
 
 ---
 
-## 🏗️ Architecture & Directory Topology
+##  Architecture & Directory Topology
 
 ```text
 personal-expense-tracker/
@@ -71,7 +71,7 @@ personal-expense-tracker/
 
 ---
 
-## ⚡ Functional Specifications & Verification
+## Functional Specifications & Verification
 
 1. **Expenditure Entry & Validation**:
    - Accepts `Title`, `Amount`, `Category` (*Food*, *Travel*, *Bills*, *Shopping*, *Other*), and `Date`.
@@ -100,7 +100,7 @@ personal-expense-tracker/
 
 ---
 
-## 🔌 API Route Catalog
+## API Route Catalog
 
 | HTTP Verb | Path | Purpose | Success Code |
 | :--- | :--- | :--- | :--- |
@@ -113,7 +113,7 @@ personal-expense-tracker/
 
 ---
 
-## 🚀 Local Setup & Testing
+## Local Setup & Testing
 
 ### Running the Full Application
 ```bash
@@ -137,7 +137,7 @@ Alternatively, running `npm start` from root will build and serve the production
 
 ---
 
-## ☁️ Render Cloud Hosting
+## Render Cloud Hosting
 
 A declarative [`render.yaml`](./render.yaml) is included in the project root:
 - **Build Command**: `npm run build`
